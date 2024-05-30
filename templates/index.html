@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Population Data</title>
+    <style>
+        table.data {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.data th, table.data td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        table.data th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>World Population Data</h1>
+    <div>
+        {% for table in tables %}
+            {{ titles|safe }}
+            {{ table|safe }}
+        {% endfor %}
+    </div>
+</body>
+</html>
