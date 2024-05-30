@@ -266,46 +266,73 @@ print(filtered_countries)
 # In[12]:
 
 
-# Step 1: Initialize the PopulationData class with the DataFrame
+#Initialize the PopulationData class with the DataFrame
 population_data = PopulationData(df)
 
-# Step 2: Add population category
+#Add population category
 population_data.add_population_category()
 
-# Step 3: Calculate continent population summary
+#Calculate continent population summary
 population_data.calculate_continent_summary()
 continent_summary = population_data.get_continent_summary()
 
-# Step 4: Display continent summary as a table
+#Display continent summary as a table
 table = [[continent, summary['Total Population'], summary['Average Population']] for continent, summary in continent_summary.items()]
 print("\nContinent Population Summary Table:")
 print(tabulate(table, headers=['Continent', 'Total Population', 'Average Population'], tablefmt='pretty'))
 
-# Step 5: Bar plot of total population by continent
+#Bar plot of total population by continent
 continent_df = pd.DataFrame(continent_summary).T.reset_index().rename(columns={'index': 'Continent'})
-plt.figure(figsize=(10, 6))
-sns.barplot(data=continent_df, x='Continent', y='Total Population')
-plt.title('Total Population by Continent')
-plt.xlabel('Continent')
-plt.ylabel('Total Population')
-plt.xticks(rotation=45)
+continent_df['Total Population'] = continent_df['Total Population'] / 1e6
+sns.set(style="whitegrid")
+plt.figure(figsize=(12, 8))
+barplot = sns.barplot(data=continent_df, x='Continent', y='Total Population', palette='viridis')
+plt.title('Total Population by Continents in 2022', fontsize=16, fontweight='bold')
+plt.xlabel('Continents', fontsize=14)
+plt.ylabel('Total Population (in Mio.)', fontsize=14)
+plt.xticks(rotation=45, fontsize=12)
+plt.yticks(fontsize=12)
+
+for p in barplot.patches:
+    barplot.annotate(f"{p.get_height():,.0f}".replace(",", "'") + " Mio.",
+                     (p.get_x() + p.get_width() / 2., p.get_height()),
+                     ha='center', va='center', 
+                     xytext=(0, 9), 
+                     textcoords='offset points',
+                     fontsize=12, fontweight='bold')
+
+plt.grid(axis='y', linestyle='--', linewidth=0.7)
 plt.tight_layout()
+plt.savefig('Charts/1. Bar plot_Total Population by continent.png')
 plt.show()
 
-# Step 6: Histogram of country populations
+
+#Histogram of the population growth rates from 2022
 plt.figure(figsize=(10, 6))
-sns.histplot(df['Population_2022'], bins=30, kde=True)
-plt.title('Distribution of Country Populations')
-plt.xlabel('Population')
-plt.ylabel('Frequency')
+sns.histplot(df['Growth_Rate'], bins=30, kde=True, color='purple')
+plt.title('Distribution of Population Growth Rates in 2022', fontsize=16, fontweight='bold')
+plt.xlabel('Growth Rate', fontsize=14)
+plt.ylabel('Frequency', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.grid(axis='y', linestyle='--', linewidth=0.7)
 plt.tight_layout()
+plt.savefig('Charts/2. Histogram_Population Growth Rates.png')
 plt.show()
 
-# Step 7: Pie chart of population categories
+#Pie chart of population categories
 category_counts = df['Population Category'].value_counts()
-plt.figure(figsize=(8, 8))
-plt.pie(category_counts, labels=category_counts.index, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("pastel"))
-plt.title('Proportion of Countries by Population Category')
+sns.set(style="whitegrid")
+plt.figure(figsize=(10, 8))
+plt.pie(category_counts, 
+        labels=category_counts.index, 
+        autopct='%1.1f%%', 
+        startangle=140, 
+        colors=sns.color_palette("viridis", len(category_counts)),
+        wedgeprops=dict(edgecolor='w'))
+plt.title('Proportion of Countries by Population Category in 2022', fontsize=16, fontweight='bold')
+plt.tight_layout()
+plt.savefig('Charts/3. Pie chart_Population Categories.png')
 plt.show()
 
 
@@ -329,25 +356,66 @@ print("\nCorrelation Analysis with 'Population_2022':")
 for col, results in correlation_results.items():
     print(f"{col}:")
     print(f"  Correlation Coefficient: {results['Correlation Coefficient']:.4f}")
-    print(f"  P-value: {results['P-value']:.4e}")
+    print(f"  P-value: {results['P-value']:.4f}")
 
-# Visualization of correlation
+#Visualization of correlation
 plt.figure(figsize=(12, 6))
 
-# Scatter plot for '2022 Population' vs 'Density (per km²)'
-plt.subplot(1, 2, 1)
-sns.scatterplot(x=df['Population_2022'], y=df['Density_per_km2'])
-plt.title(f"Population vs. Density (per km²)\nCorrelation: {correlation_results['Density_per_km2']['Correlation Coefficient']:.4f}, P-value: {correlation_results['Density_per_km2']['P-value']:.4e}")
-plt.xlabel('Population_2022')
-plt.ylabel('Density_per_km2')
+#Scatter Plot Population vs Density with Annotations
+df['Population_2022_Billions'] = df['Population_2022'] / 1e9
 
-# Scatter plot for '2022 Population' vs 'Growth Rate'
-plt.subplot(1, 2, 2)
-sns.scatterplot(x=df['Population_2022'], y=df['Growth_Rate'])
-plt.title(f"Population vs. Growth Rate\nCorrelation: {correlation_results['Growth_Rate']['Correlation Coefficient']:.4f}, P-value: {correlation_results['Growth_Rate']['P-value']:.4e}")
-plt.xlabel('Population_2022')
-plt.ylabel('Growth_Rate')
+# Set a modern style
+sns.set(style="whitegrid")
+
+plt.figure(figsize=(12, 8))
+scatter = sns.scatterplot(x=df['Population_2022_Billions'], y=df['Density_per_km2'], color='purple', s=100, alpha=0.7, edgecolor='w')
+plt.title(f"Population vs. Density (per km²) in 2022\nCorrelation: {correlation_results['Density_per_km2']['Correlation Coefficient']:.4f}, P-value: {correlation_results['Density_per_km2']['P-value']:.4f}", fontsize=16, fontweight='bold')
+plt.xlabel('Population in 2022 (in Mrd)', fontsize=14)
+plt.ylabel('Density per km²', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.grid(axis='y', linestyle='--', linewidth=0.7)
+
+# Annotate the top 5 countries with the highest population density
+top_density_countries = df.nlargest(5, 'Density_per_km2')
+for idx, row in top_density_countries.iterrows():
+    plt.annotate(row['Country_Territory'], (row['Population_2022_Billions'], row['Density_per_km2']),
+                 textcoords="offset points", xytext=(0,10), ha='center', fontsize=12, fontweight='bold')
+
+# Annotate the countries with a population around 1.4 billion (1.4 Mrd)
+high_population_countries = df[df['Population_2022_Billions'].between(1.35, 1.45)]
+for idx, row in high_population_countries.iterrows():
+    plt.annotate(row['Country_Territory'], (row['Population_2022_Billions'], row['Density_per_km2']),
+                 textcoords="offset points", xytext=(0,10), ha='center', fontsize=12, fontweight='bold')
 
 plt.tight_layout()
+plt.savefig('Charts/4. Scatter Plot_Population vs Density.png')
 plt.show()
 
+# Scatter plot for '2022 Population' vs 'Growth Rate'
+sns.set(style="whitegrid")
+
+plt.figure(figsize=(12, 8))
+scatter = sns.scatterplot(x=df['Population_2022_Billions'], y=df['Growth_Rate'], color='blue', s=100, alpha=0.7, edgecolor='w')
+plt.title(f"Population vs. Growth Rate in 2022\nCorrelation: {correlation_results['Growth_Rate']['Correlation Coefficient']:.4f}, P-value: {correlation_results['Growth_Rate']['P-value']:.4f}", fontsize=16, fontweight='bold')
+plt.xlabel('Population in 2022 (in Mrd)', fontsize=14)
+plt.ylabel('Growth Rate', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.grid(axis='y', linestyle='--', linewidth=0.7)
+
+# Annotate the top country with the highest growth rate
+top_growth_countries = df.nlargest(1, 'Growth_Rate')
+for idx, row in top_growth_countries.iterrows():
+    plt.annotate(row['Country_Territory'], (row['Population_2022_Billions'], row['Growth_Rate']),
+                 textcoords="offset points", xytext=(0,10), ha='center', fontsize=12, fontweight='bold')
+
+# Annotate the countries with a population around 1.4 billion (1.4 Mrd)
+high_population_countries = df[df['Population_2022_Billions'].between(1.35, 1.45)]
+for idx, row in high_population_countries.iterrows():
+    plt.annotate(row['Country_Territory'], (row['Population_2022_Billions'], row['Growth_Rate']),
+                 textcoords="offset points", xytext=(0,10), ha='center', fontsize=12, fontweight='bold')
+
+plt.tight_layout()
+plt.savefig('Charts/5. Scatter Plot_Population vs Growth Rate.png')
+plt.show()
