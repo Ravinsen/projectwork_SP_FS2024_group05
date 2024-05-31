@@ -142,11 +142,11 @@ print(df.to_string())
 # In[5]:
 
 
-# Extract specific columns into lists
+# Lists
 countries = df['Country_Territory'].tolist()
 populations = df['Population_2022'].tolist()
 
-# Create a dictionary from a subset of the data
+# Dictionary
 country_population_dict = dict(zip(countries, populations))
 
 print(country_population_dict)
@@ -158,7 +158,7 @@ print(country_population_dict)
 # Use sets to find unique values
 continents = set(df['Continent'])
 
-# Utilize tuples for specific operations
+# Tuples
 country_population_tuples = list(zip(countries, populations))
 
 print(country_population_tuples)
@@ -169,15 +169,15 @@ print(country_population_tuples)
 
 country_population_tuples = list(zip(countries, populations))
 
-# Displaying the extracted lists, dictionary, set, and tuples
+
 print("\nList of countries:")
-print(countries[:10])  # Display first 10 countries for brevity
+print(countries[:10])  
 
 print("\nList of populations:")
-print(populations[:10])  # Display first 10 populations for brevity
+print(populations[:10])  
 
 print("\nDictionary of country and population:")
-print(list(country_population_dict.items())[:10])  # Display first 10 items for brevity
+print(list(country_population_dict.items())[:10]) 
 
 
 # In[8]:
@@ -237,24 +237,24 @@ class PopulationData:
 
 # Usage example:
 
-# Step 1: Initialize the PopulationData class with the DataFrame
+# Initialize the PopulationData class with the DataFrame
 population_data = PopulationData(df)
 
-# Step 2: Add population category
+# Add population category
 population_data.add_population_category()
 
-# Step 3: Print the DataFrame to see the output
+# Print the DataFrame to see the output
 print("\nDataFrame with Population Category:")
 print(population_data.df[['Country_Territory', 'Population_2022', 'Population Category']].head())
 
-# Step 4: Calculate and print continent population summary
+# Calculate and print continent population summary
 population_data.calculate_continent_summary()
 continent_summary = population_data.get_continent_summary()
 print("\nContinent Population Summary:")
 for continent, summary in continent_summary.items():
     print(f"{continent}: Total Population = {summary['Total Population']}, Average Population = {summary['Average Population']}")
 
-# Step 5: Filter countries by population threshold and print them
+# Filter countries by population threshold and print them
 population_threshold = 5_000_000
 filtered_countries = population_data.filter_countries_by_population(population_threshold)
 print(f"\nCountries with population greater than {population_threshold}:")
